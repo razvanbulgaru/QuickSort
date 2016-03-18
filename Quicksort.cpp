@@ -12,6 +12,27 @@ enum PivotType {
     RANDOM_ELEMENT
 };
 
+
+template<typename Iter>
+bool testQuickSort(Iter begin, Iter end) {
+	if (begin == end)
+		return false;
+
+	while (begin != end)
+	{
+		int a = *begin;
+		++begin;
+		if (a>*begin && begin != end)
+		{
+			std::cout << *begin << " is not greater than " << a;
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
 template<typename Iter>
 void quickSort(Iter begin, Iter end, PivotType pivotType) {
     
@@ -33,32 +54,34 @@ void quickSort(Iter begin, Iter end, PivotType pivotType) {
             break;
     }
 
-    std::copy(begin, end, std::ostream_iterator<int>(std::cout, " "));
-    std::cout << std::endl;
-
     Iter middle1 = std::stable_partition(begin, end, [pivot](const auto& em) { return em < pivot; });
-    std::copy(begin, end, std::ostream_iterator<int>(std::cout, " "));
-    std::cout<< std::endl << *middle1 << std::endl << std::endl;
     
     quickSort(begin, middle1, pivotType);
     quickSort(middle1 + 1, end, pivotType);
 }
 
 int main() {
-    //std::ifstream inputFile("C:/QuickSort.txt");
-    //std::istream_iterator<int> start(inputFile);
-    //std::istream_iterator<int> end;
-    //std::vector<int> externalData(start, end);
-
-    std::vector<int> array = {2,3,7,8,9,2,5,1,4,0,5,6,5,8,0,4,2,7,4,1,7,9,9,3};
-
-    std::copy(array.begin(), array.end(), std::ostream_iterator<int>(std::cout, " "));
-    std::cout << std::endl << std::endl;
+    std::ifstream inputFile("Path to input array");
+    if (!inputFile.is_open())
+    {
+    	std::cout << "Nu s-a deschis fisierul!!!";
+    	return 0;
+    }
+    
+    std::istream_iterator<int> start(inputFile);
+    std::istream_iterator<int> end;
+    std::vector<int> array(start, end);
     
     quickSort(array.begin(), array.end(), PivotType::FIRST_ELEMENT);
 
-    std::copy(array.begin(), array.end(), std::ostream_iterator<int>(std::cout, " "));
-    std::cout<< std::endl << std::endl;
+    std::ofstream outputFile("Path to output file");
+
+    if (testQuickSort(array.begin(), array.end()))
+    	std::cout<<"The array is sorted!";
+    else
+    	std::cout<<"The array is not sorted!";
+
+    std::copy(array.begin(), array.end(), std::ostream_iterator<int>(outputFile, " "));
 
     return 0;
 }
